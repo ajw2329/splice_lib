@@ -782,7 +782,12 @@ def get_unique_edges(included_exons, excluded_exons):
     
 
 
-def complete_event_dict(standard_event_dict, suppress_unique_edges = False, suppress_eij = False, no_ends = True, inform_using_ri_events = True):
+def complete_event_dict(
+    standard_event_dict, 
+    suppress_unique_edges = False, 
+    suppress_eij = False, 
+    no_ends = True, 
+    inform_using_ri_events = True):
 
     '''
         Sorts event exons, infers junctions - necessary to complete event dict
@@ -922,6 +927,35 @@ def complete_event_dict(standard_event_dict, suppress_unique_edges = False, supp
 
         standard_event_dict[event]["included_jn_count"] = str(len(standard_event_dict[event]["included_junction_counts"])) ##confusing terminology! this is just the number of junctions
         standard_event_dict[event]["excluded_jn_count"] = str(len(standard_event_dict[event]["excluded_junction_counts"]))
+
+
+
+
+def add_transcripts_to_event_dict(ioe_file, standard_event_dict):
+
+    '''
+        Creates pseudo event and transcript dicts 
+        to run event_nmd_nsd_status and output_table 
+        functions without having passed the full 
+        dicts as input to main.  Useful if 
+        running script as standalone.
+    '''
+
+    with open(ioe_file, 'r') as file:
+
+        next(file)
+
+        for line in file:
+
+            entry = line.strip().split()
+            event = entry[2].split(";")[1]
+
+            included_form_transcripts = entry[3].split(",")
+            all_transcripts = entry[4].split(",")
+            excluded_form_transcripts = list(set(all_transcripts) - set(included_form_transcripts))
+
+            standard_event_dict[event]["included_form_transcripts"] = list(included_form_transcripts) 
+            standard_event_dict[event]["excluded_form_transcripts"] = list(excluded_form_transcripts)
 
 
 
