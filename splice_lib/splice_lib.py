@@ -707,8 +707,8 @@ def get_exon_overlapping_ei_junctions_list(
 
 
 def get_exon_overlapping_ei_junctions_core(
-    comparator_unique_exons, 
-    source_exons):
+        comparator_unique_exons, 
+        source_exons):
 
     source_unique_exon_ol_eij = []
 
@@ -725,7 +725,7 @@ def get_exon_overlapping_ei_junctions_core(
                     elif index == 0:
                         source_unique_exon_ol_eij += [boundary - 1]
 
-    return source_unique_exon_ol_eij
+    return sorted(source_unique_exon_ol_eij)
 
 
 
