@@ -1935,146 +1935,395 @@ def rename_events(standard_event_dict):
     return new_event_dict
 
 
-def output_event_gtf(standard_event_dict, outdir, name="splice_lib_events"):
+def output_event_gtf(
+        standard_event_dict, 
+        outdir, 
+        name="splice_lib_events"):
 
     with open(outdir + "/" + name + ".gtf", 'w') as file:
 
-        for event in standard_event_dict:
+        for event, event_val in standard_event_dict.iteritems():
 
-            chrom = re.sub("&","_",standard_event_dict[event]["chrom"])
-            strand = standard_event_dict[event]["strand"]
+            chrom = re.sub("&","_",event_val["chrom"])
+            strand = event_val["strand"]
 
-            for exon in standard_event_dict[event]["included_exons"]:
+            for exon in event_val["included_exons"]:
 
                 start = str(exon[0])
                 end = str(exon[1])
                 isoform_id = event + "_included"
 
-                file.write("\t".join([chrom, "splice_lib_event", "exon", start, end, ".", strand, ".", "gene_id " + '"' + event + '"; transcript_id ' + '"' + isoform_id + '";']) + "\n")
+                file.write(
+                    "\t".join(
+                        [
+                            chrom, 
+                            "splice_lib_event", 
+                            "exon", 
+                            start, 
+                            end, 
+                            ".", 
+                            strand, 
+                            ".", 
+                            ("gene_id " + 
+                             '"' + 
+                             event + 
+                             '"; transcript_id ' + 
+                             '"' + 
+                             isoform_id + 
+                             '";')]) + "\n")
 
-            for exon in standard_event_dict[event]["excluded_exons"]:
+            for exon in event_val["excluded_exons"]:
 
                 start = str(exon[0])
                 end = str(exon[1])
                 isoform_id = event + "_excluded"
 
-                file.write("\t".join([chrom, "splice_lib_event", "exon", start, end, ".", strand, ".", "gene_id " + '"' + event + '"; transcript_id ' + '"' + isoform_id + '";']) + "\n")
+                file.write(
+                    "\t".join(
+                        [
+                            chrom, 
+                            "splice_lib_event", 
+                            "exon", 
+                            start, 
+                            end, 
+                            ".", 
+                            strand, 
+                            ".", 
+                            ("gene_id " + 
+                             '"' + 
+                             event + 
+                             '"; transcript_id ' + 
+                             '"' + 
+                             isoform_id + '";')]) + "\n")
 
-def output_event_bedfile(standard_event_dict, outdir, name = "splice_lib_events"):
+
+def output_event_bedfile(
+        standard_event_dict, 
+        outdir, 
+        name = "splice_lib_events"):
 
     with open(outdir + "/" + name + ".bed", 'w') as file:
 
-        for event in standard_event_dict:
+        for event, event_val in standard_event_dict.iteritems():
 
-            chrom = re.sub("&","_",standard_event_dict[event]["chrom"])
-            strand = standard_event_dict[event]["strand"]    
+            chrom = re.sub("&","_",event_val["chrom"])
+            strand = event_val["strand"]    
 
-            start = str(standard_event_dict[event]["included_exons"][0][0])
-            end = str(standard_event_dict[event]["included_exons"][-1][1])
+            try:
+                start = str(event_val["included_exons"][0][0])
+            except IndexError:
+                print event
+                print event_val
+                sys.exit("Problem finding event start in splice_lib.output_event_bedfile")
+
+            try:
+                end = str(event_val["included_exons"][-1][1])
+            except IndexError:
+                print event
+                print event_val
+                sys.exit("Problem finding event start in splice_lib.output_event_bedfile")                
 
             file.write("\t".join([chrom, start, end, event, "1000", strand]) + "\n")    
 
 
-def output_event_gtf_with_transcripts(standard_event_dict, outdir, name="splice_lib_events_with_transcripts"):
+def output_event_gtf_with_transcripts(
+        standard_event_dict, 
+        outdir, 
+        name="splice_lib_events_with_transcripts"):
 
     with open(outdir + "/" + name + ".gtf", 'w') as file:
 
-        for event in standard_event_dict:
+        for event, event_val in standard_event_dict.iteritems():
 
-            chrom = re.sub("&","_",standard_event_dict[event]["chrom"])
-            strand = standard_event_dict[event]["strand"]
+            chrom = re.sub("&","_",event_val["chrom"])
+            strand = event_val["strand"]
 
-            gene_transcript_start = str(standard_event_dict[event]["included_exons"][0][0])
-            gene_transcript_end = str(standard_event_dict[event]["included_exons"][-1][1])
+            gene_transcript_start = str(event_val["included_exons"][0][0])
+            gene_transcript_end = str(event_val["included_exons"][-1][1])
 
 
-            file.write("\t".join([chrom, "splice_lib_event", "transcript", gene_transcript_start, gene_transcript_end, ".", strand, ".", "gene_id " + '"' + event + '"; transcript_id ' + '"' + event + "_included" + '";']) + "\n")
+            file.write(
+                "\t".join(
+                    [
+                        chrom, 
+                        "splice_lib_event", 
+                        "transcript", 
+                        gene_transcript_start, 
+                        gene_transcript_end, 
+                        ".", 
+                        strand, 
+                        ".", 
+                        ("gene_id " + 
+                         '"' + 
+                         event + 
+                         '"; transcript_id ' + 
+                         '"' + 
+                         event + 
+                         "_included" + 
+                         '";')]) + "\n")
 
-            for exon in standard_event_dict[event]["included_exons"]:
+            for exon in event_val["included_exons"]:
 
                 start = str(exon[0])
                 end = str(exon[1])
                 isoform_id = event + "_included"
 
-                file.write("\t".join([chrom, "splice_lib_event", "exon", start, end, ".", strand, ".", "gene_id " + '"' + event + '"; transcript_id ' + '"' + isoform_id + '";']) + "\n")
+                file.write(
+                    "\t".join(
+                        [
+                            chrom, 
+                            "splice_lib_event", 
+                            "exon", 
+                            start, 
+                            end, 
+                            ".", 
+                            strand, 
+                            ".", 
+                            ("gene_id " + 
+                             '"' + 
+                             event + 
+                             '"; transcript_id ' + 
+                             '"' + 
+                             isoform_id + 
+                             '";')]) + "\n")
 
-            file.write("\t".join([chrom, "splice_lib_event", "transcript", gene_transcript_start, gene_transcript_end, ".", strand, ".", "gene_id " + '"' + event + '"; transcript_id ' + '"' + event + "_excluded" + '";']) + "\n")
+            file.write(
+                "\t".join(
+                    [
+                        chrom, 
+                        "splice_lib_event", 
+                        "transcript", 
+                        gene_transcript_start, 
+                        gene_transcript_end, 
+                        ".", 
+                        strand, 
+                        ".", 
+                        ("gene_id " + 
+                         '"' + 
+                         event + 
+                         '"; transcript_id ' + 
+                         '"' + 
+                         event + 
+                         "_excluded" + 
+                         '";')]) + "\n")
 
-            for exon in standard_event_dict[event]["excluded_exons"]:
+            for exon in event_val["excluded_exons"]:
 
                 start = str(exon[0])
                 end = str(exon[1])
                 isoform_id = event + "_excluded"
 
-                file.write("\t".join([chrom, "splice_lib_event", "exon", start, end, ".", strand, ".", "gene_id " + '"' + event + '"; transcript_id ' + '"' + isoform_id + '";']) + "\n")
+                file.write(
+                    "\t".join(
+                        [
+                            chrom, 
+                            "splice_lib_event", 
+                            "exon", 
+                            start, 
+                            end, 
+                            ".", 
+                            strand, 
+                            ".", 
+                            ("gene_id " + 
+                             '"' + 
+                             event + 
+                             '"; transcript_id ' + 
+                             '"' + 
+                             isoform_id + 
+                             '";')]) + "\n")
 
 
-def output_miso_event_gff3(standard_event_dict, outdir, name="splice_lib_events"):
+def output_miso_event_gff3(
+        standard_event_dict, 
+        outdir, 
+        name="splice_lib_events"):
 
     with open(outdir + "/" + name + ".gff3", 'w') as file:
 
         file.write("##gff-version 3" + "\n")
 
-        for event in standard_event_dict:
+        for event, event_val in standard_event_dict.iteritems():
 
 
-            chrom = re.sub("&","_",standard_event_dict[event]["chrom"])
-            strand = standard_event_dict[event]["strand"]
+            chrom = re.sub("&","_",event_val["chrom"])
+            strand = event_val["strand"]
 
 
-            gene_transcript_start = str(standard_event_dict[event]["included_exons"][0][0])
-            gene_transcript_end = str(standard_event_dict[event]["included_exons"][-1][1])
+            gene_transcript_start = str(event_val["included_exons"][0][0])
+            gene_transcript_end = str(event_val["included_exons"][-1][1])
 
             gene = parent = event
 
-            file.write("\t".join([chrom, "splice_lib_event", "gene", gene_transcript_start, gene_transcript_end, ".", strand, ".", "ID=" + event + ";Name=" + event]) + "\n")
-            file.write("\t".join([chrom, "splice_lib_event", "transcript", gene_transcript_start, gene_transcript_end, ".", strand, ".", "ID=" + event + "_included" + ";Parent=" + event]) + "\n")
+            file.write(
+                "\t".join(
+                    [
+                        chrom, 
+                        "splice_lib_event", 
+                        "gene", 
+                        gene_transcript_start, 
+                        gene_transcript_end, 
+                        ".", 
+                        strand, 
+                        ".", 
+                        ("ID=" + 
+                         event + 
+                         ";Name=" + 
+                         event)]) + "\n")
+
+            file.write(
+                "\t".join(
+                    [
+                        chrom, 
+                        "splice_lib_event", 
+                        "transcript", 
+                        gene_transcript_start, 
+                        gene_transcript_end, 
+                        ".", 
+                        strand, 
+                        ".", 
+                        ("ID=" + 
+                         event + 
+                         "_included" + 
+                         ";Parent=" + 
+                         event)]) + "\n")
 
 
-            for index, exon in enumerate(standard_event_dict[event]["included_exons"]):
+            for index, exon in enumerate(event_val["included_exons"]):
 
                 start = str(exon[0])
                 end = str(exon[1])
                 isoform_id = event + "_included"
 
-                file.write("\t".join([chrom, "splice_lib_event", "exon", start, end, ".", strand, ".", "ID=exon:" + event + "_included:" + str(index + 1) + ";Parent=" + event + "_included"]) + "\n")
+                file.write(
+                    "\t".join(
+                        [
+                            chrom, 
+                            "splice_lib_event", 
+                            "exon", 
+                            start, 
+                            end, 
+                            ".", 
+                            strand, 
+                            ".", 
+                            ("ID=exon:" + 
+                             event + 
+                             "_included:" + 
+                             str(index + 1) + 
+                             ";Parent=" + 
+                             event + 
+                             "_included")]) + "\n")
 
 
-            file.write("\t".join([chrom, "splice_lib_event", "transcript", gene_transcript_start, gene_transcript_end, ".", strand, ".", "ID=" + event + "_excluded" + ";Parent=" + event]) + "\n")
+            file.write(
+                "\t".join(
+                    [
+                        chrom, 
+                        "splice_lib_event", 
+                        "transcript", 
+                        gene_transcript_start, 
+                        gene_transcript_end, 
+                        ".", 
+                        strand, 
+                        ".", 
+                        ("ID=" + 
+                         event + 
+                         "_excluded" + 
+                         ";Parent=" + 
+                         event)]) + "\n")
 
 
-            for index, exon in enumerate(standard_event_dict[event]["excluded_exons"]):
+            for index, exon in enumerate(event_val["excluded_exons"]):
 
                 start = str(exon[0])
                 end = str(exon[1])
                 isoform_id = event + "_excluded"
 
-                file.write("\t".join([chrom, "splice_lib_event", "exon", start, end, ".", strand, ".", "ID=exon:" + event + "_excluded:" + str(index + 1) + ";Parent=" + event + "_excluded"]) + "\n")
+                file.write(
+                    "\t".join(
+                        [
+                            chrom, 
+                            "splice_lib_event", 
+                            "exon", 
+                            start, 
+                            end, 
+                            ".", 
+                            strand, 
+                            ".", 
+                            ("ID=exon:" + 
+                             event + 
+                             "_excluded:" + 
+                             str(index + 1) + 
+                             ";Parent=" + 
+                             event + 
+                             "_excluded")]) + "\n")
 
 
 
-def output_transcript_gtf(standard_transcript_dict, outdir, name = "splice_lib_transcripts"):
+def output_transcript_gtf(
+        standard_transcript_dict, 
+        outdir, 
+        name = "splice_lib_transcripts"):
 
     with open(outdir + "/" + name + ".gtf", 'w') as file:
 
-        for transcript in standard_transcript_dict:
+        for transcript, transcript_val in standard_transcript_dict.iteritems():
 
-            chrom = re.sub("&", "_", standard_transcript_dict[transcript]["chrom"])
-            strand = standard_transcript_dict[transcript]["strand"]
+            chrom = re.sub("&", "_", transcript_val["chrom"])
+            strand = transcript_val["strand"]
 
-            start = str(standard_transcript_dict[transcript]["exons"][0][0])
-            end = str(standard_transcript_dict[transcript]["exons"][-1][1])
+            start = str(transcript_val["exons"][0][0])
+            end = str(transcript_val["exons"][-1][1])
 
             try:
-                gene = standard_transcript_dict[transcript]["gene"]
+                gene = transcript_val["gene"]
             except KeyError:
                 sys.exit("Tried to output a transcript gtf with no gene name. Exiting . . . ")
 
-            file.write("\t".join([chrom, "splice_lib_transcript", "transcript", start, end, ".", strand, ".", "gene_name " + '"' + gene + '"; gene_id ' + '"' + gene +  '"; transcript_id ' + '"' + transcript + '";']) + "\n")
+            file.write(
+                "\t".join(
+                    [
+                        chrom, 
+                        "splice_lib_transcript", 
+                        "transcript", 
+                        start, 
+                        end, 
+                        ".", 
+                        strand, 
+                        ".", 
+                        ("gene_name " + 
+                         '"' + 
+                         gene + 
+                         '"; gene_id ' + 
+                         '"' + 
+                         gene +  
+                         '"; transcript_id ' + 
+                         '"' + 
+                         transcript + 
+                         '";')]) + "\n")
 
-            for exon in standard_transcript_dict[transcript]["exons"]:
+            for exon in transcript_val["exons"]:
 
                 start = str(exon[0])
                 end = str(exon[1])
 
-                file.write("\t".join([chrom, "splice_lib_transcript", "exon", start, end, ".", strand, ".", "gene_name " + '"' + gene + '"; gene_id ' + '"' + gene + '"; transcript_id ' + '"' + transcript + '";']) + "\n")
+                file.write(
+                    "\t".join(
+                        [
+                            chrom, 
+                            "splice_lib_transcript", 
+                            "exon", 
+                            start, 
+                            end, 
+                            ".", 
+                            strand, 
+                            ".", 
+                            ("gene_name " + 
+                             '"' + 
+                             gene + 
+                             '"; gene_id ' + 
+                             '"' + 
+                             gene + 
+                             '"; transcript_id ' + 
+                             '"' + 
+                             transcript + 
+                             '";')]) + "\n")
