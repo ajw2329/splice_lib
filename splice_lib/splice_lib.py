@@ -2262,11 +2262,16 @@ def output_miso_event_gff3(
 def output_transcript_gtf(
         standard_transcript_dict, 
         outdir, 
-        name = "splice_lib_transcripts"):
+        name = "splice_lib_transcripts",
+        prefix = None):
 
     with open(outdir + "/" + name + ".gtf", 'w') as file:
 
         for transcript, transcript_val in standard_transcript_dict.iteritems():
+
+            if prefix:
+
+                transcript = prefix + "_" + transcript
 
             chrom = re.sub("&", "_", transcript_val["chrom"])
             strand = transcript_val["strand"]
