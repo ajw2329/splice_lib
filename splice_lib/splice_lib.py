@@ -2271,7 +2271,7 @@ def output_transcript_gtf(
 
             if transcript_prefix:
 
-                transcript = prefix + "_" + transcript
+                transcript = transcript_prefix + "_" + transcript
 
             chrom = re.sub("&", "_", transcript_val["chrom"])
             strand = transcript_val["strand"]
