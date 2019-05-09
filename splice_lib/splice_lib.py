@@ -1077,7 +1077,9 @@ def complete_event_dict(
 
 
 
-def add_transcripts_to_event_dict(ioe_file, standard_event_dict):
+def add_transcripts_to_event_dict(
+        ioe_files, 
+        standard_event_dict):
 
     '''
         Creates pseudo event and transcript dicts 
@@ -1087,26 +1089,25 @@ def add_transcripts_to_event_dict(ioe_file, standard_event_dict):
         running script as standalone.
     '''
 
-    with open(ioe_file, 'r') as file:
+    for i in ioe_files.split(","):
 
-        next(file)
+        with open(i, 'r') as file:
 
-        for line in file:
+            next(file)
 
-            entry = line.strip().split()
-            event = entry[2].split(";")[1]
+            for line in file:
 
-            included_form_transcripts = entry[3].split(",")
-            all_transcripts = entry[4].split(",")
-            excluded_form_transcripts = list(set(all_transcripts) - set(included_form_transcripts))
+                entry = line.strip().split()
+                event = entry[2].split(";")[1]
 
-            standard_event_dict[event]["included_form_transcripts"] = list(included_form_transcripts) 
-            standard_event_dict[event]["excluded_form_transcripts"] = list(excluded_form_transcripts)
+                included_form_transcripts = set(entry[3].split(","))
+                all_transcripts = entry[4].split(",")
+                excluded_form_transcripts = set(all_transcripts) - included_form_transcripts
 
+                event_val = standard_event_dict[event]
 
-
-
-
+                event_val.setdefault("included_form_transcripts", set()).union(included_form_transcripts)
+                event_val.setdefault("excluded_form_transcripts", set()).union(excluded_form_transcripts)
 
 
 def complete_event_dict_chrom_strand(
