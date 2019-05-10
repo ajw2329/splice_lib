@@ -164,7 +164,7 @@ def translate_ORF(transcript_seq, stop_codons, valid_adj_cds_start):
         codon_list = ("").join(codon_list)
         result=[False, None,codon_list]
 
-    AA= tl.translate_seq(codon_list)
+    AA= translate_seq(codon_list)
     result.append(AA)
     return result
 
