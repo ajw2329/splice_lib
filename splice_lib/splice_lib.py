@@ -1106,8 +1106,11 @@ def add_transcripts_to_event_dict(
 
                 event_val = standard_event_dict[event]
 
-                event_val.setdefault("included_form_transcripts", set()).union(included_form_transcripts)
-                event_val.setdefault("excluded_form_transcripts", set()).union(excluded_form_transcripts)
+                event_val["included_form_transcripts"] = set(
+                    event_val["included_form_transcripts"]).union(included_form_transcripts)
+                event_val["excluded_form_transcripts"] = set(
+                    event_val["excluded_form_transcripts"]).union(excluded_form_transcripts)
+
 
 
 def complete_event_dict_chrom_strand(
