@@ -23,9 +23,8 @@ def translate_seq(seq):
 
     peptide = ''
   
-    for i in xrange(0, len(seq), 3):
+    for i in codon_gen(seq):
 
-        codon = seq[i: i+3]
         amino_acid = codon_table.get(codon, '*')
         if amino_acid != '*':
 
@@ -37,7 +36,131 @@ def translate_seq(seq):
                  
     return peptide
 
+
     
+def codon_gen(seq):
+    '''
+    Generator that takes as input a sequence
+    and yields codon strings (consecutive groups of 3 bases)
+
+    This function does not attempt to check whether the sequence is a 
+    valid CDS.  
+
+    If the provided sequence is not divisible by three, the final 
+    (sequence length % 3) bases will be ignored
+
+    Parameters
+    ----------
+    seq : str
+        Nucleotide sequence (note that character identity is not policed for ATGCU bases)
+
+    Yields
+    ------
+    str
+        Codon (3-character string)
+
+
+    codon_gen should provide all codons in a given sequence, starting from the beginning.
+
+    >>> [i for i in codon_gen("ATGAAAGGGCCC")]
+    ['ATG', 'AAA', 'GGG', 'CCC']
+
+
+    If the length of the provided sequence is not divisible by 3, the extra bases will be ignored.
+
+
+    >>> [i for i in codon_gen("ATGAAAGGGCC")]
+    ['ATG', 'AAA', 'GGG']
+
+    '''
+
+    seq_len = len(seq)
+
+    for i in range(0, seq_len - seq_len%3, 3):
+
+        yield seq[i:i+3].upper()
+
+
+
+
+def unique_codons(seq):
+    '''
+    Takes as input a nucleotide sequence (GCATU not enforced)
+    and returns set of unique codons in the sequence
+
+    Uses codon_gen() to get the codons, which generates codons
+    from the beginning of the sequence.  If the sequence length
+    is not divisible by 3 the remaining bases will be ignored.
+
+    Parameters
+    ----------
+    seq : str
+        Nucleotide sequence (note that character identity is not policed for ATGCU bases)
+
+
+    Returns
+    ------
+    set
+        Set of codons
+
+
+    Note that tests are wrapped with sorted to avoid issues with doctest 
+    failing tests due to sorting not being guaranteed for sets
+
+    >>> sorted(unique_codons("ATGAAAGGGCCC"))
+    ['AAA', 'ATG', 'CCC', 'GGG']
+
+    Only unique codons are retained
+
+    >>> sorted(unique_codons("ATGAAAGGGCCCGGG"))
+    ['AAA', 'ATG', 'CCC', 'GGG']
+
+    Extra bases will be removed
+
+    >>> sorted(unique_codons("ATGAAAGGGCC"))
+    ['AAA', 'ATG', 'GGG']
+
+    and again here
+
+    >>> sorted(unique_codons("ATGAAAGGGCCCCC"))
+    ['AAA', 'ATG', 'CCC', 'GGG']
+
+    '''
+
+    return set(codon_gen(seq))
+
+
+def codon_set_diff(seq_list_1, seq_list_2):
+    '''
+    Identifies codons common to all sequences
+    in seq_list_1 and not found in any of the 
+    sequences in seq_list_2
+
+    Parameters
+    ----------
+    seq_list_1 : list of str
+        List of nucleotide sequences (note that character identity is not policed for ATGCU bases)
+    seq_list_2 : list of str
+        List of nucleotide sequences (note that character identity is not policed for ATGCU bases)        
+
+    Returns
+    ------
+    set
+        Set of codons common to seqs in seq_list_1 and 
+        not found in seq_list_2
+
+    >>> sorted(codon_set_diff(["AAACCCGGG","CCCGGG"], ["CCCTTTGCCACA", "CCCAAA"]))
+    ['GGG']
+    '''
+
+    codon_list_1 = [set(codon_gen(i)) for i in seq_list_1]
+    codon_list_2 = [set(codon_gen(i)) for i in seq_list_2]
+
+    return (set(codon_list_1[0]).intersection(*codon_list_1[1:]))\
+        .difference(*codon_list_2)
+
+
+
 
 def get_junctions(exon_list):
 
