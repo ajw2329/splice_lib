@@ -83,7 +83,7 @@ def codon_gen(seq):
 
 
 
-def unique_codons(seq):
+def unique_codon_ngrams(seq, ngrams = (1,)):
     '''
     Takes as input a nucleotide sequence (GCATU not enforced)
     and returns set of unique codons in the sequence
@@ -96,41 +96,68 @@ def unique_codons(seq):
     ----------
     seq : str
         Nucleotide sequence (note that character identity is not policed for ATGCU bases)
-
+    ngrams : tuple
+        Sizes of desired ngrams. `ngrams = (1,2,3)` would return a set of unique monograms
+        bigrams, and trigrams
 
     Returns
     ------
-    set
-        Set of codons
+    codon_ngrams : set
+        Set of distinct codon ngrams
 
 
     Note that tests are wrapped with sorted to avoid issues with doctest 
     failing tests due to sorting not being guaranteed for sets
 
-    >>> sorted(unique_codons("ATGAAAGGGCCC"))
+    >>> sorted(unique_codon_ngrams("ATGAAAGGGCCC"))
     ['AAA', 'ATG', 'CCC', 'GGG']
 
     Only unique codons are retained
 
-    >>> sorted(unique_codons("ATGAAAGGGCCCGGG"))
+    >>> sorted(unique_codon_ngrams("ATGAAAGGGCCCGGG"))
     ['AAA', 'ATG', 'CCC', 'GGG']
 
     Extra bases will be removed
 
-    >>> sorted(unique_codons("ATGAAAGGGCC"))
+    >>> sorted(unique_codon_ngrams("ATGAAAGGGCC"))
     ['AAA', 'ATG', 'GGG']
 
     and again here
 
-    >>> sorted(unique_codons("ATGAAAGGGCCCCC"))
+    >>> sorted(unique_codon_ngrams("ATGAAAGGGCCCCC"))
     ['AAA', 'ATG', 'CCC', 'GGG']
 
+    >>> sorted(unique_codon_ngrams("ATGAAAGGGCCC", (1,2,3)))
+    ['AAA', 'AAAGGG', 'AAAGGGCCC', 'ATG', 'ATGAAA', 'ATGAAAGGG', 'CCC', 'GGG', 'GGGCCC']
+
+    >>> sorted(unique_codon_ngrams("ATGAAAGGGCC", (1,2,3)))
+    ['AAA', 'AAAGGG', 'ATG', 'ATGAAA', 'ATGAAAGGG', 'GGG']
+
+    >>> sorted(unique_codon_ngrams("ATGAAAGGGCCC", (1,5)))
+    ['AAA', 'ATG', 'CCC', 'GGG']
     '''
 
-    return set(codon_gen(seq))
+    codon_ngrams = set()
+
+    codons = list(codon_gen(seq))
+
+    for i in ngrams:
+
+        if i == 1:
+
+            codon_ngrams = codon_ngrams.union(set(codons))
+
+        else:
+
+            for index in range(len(codons)-(i-1)):
+
+                codon_ngrams.add("".join(codons[index:index+i]))
+
+    return codon_ngrams
 
 
-def codon_set_diff(seq_list_1, seq_list_2):
+
+def codon_set_diff(seq_list_1, seq_list_2, ngrams = (1,)):
     '''
     Identifies codons common to all sequences
     in seq_list_1 and not found in any of the 
@@ -151,10 +178,13 @@ def codon_set_diff(seq_list_1, seq_list_2):
 
     >>> sorted(codon_set_diff(["AAACCCGGG","CCCGGG"], ["CCCTTTGCCACA", "CCCAAA"]))
     ['GGG']
+
+    >>> sorted(codon_set_diff(["AAACCCGGG","CCCGGG"], ["CCCTTTGCCACA", "CCCAAA"], ngrams = (2,)))
+    ['CCCGGG']
     '''
 
-    codon_list_1 = [set(codon_gen(i)) for i in seq_list_1]
-    codon_list_2 = [set(codon_gen(i)) for i in seq_list_2]
+    codon_list_1 = [unique_codon_ngrams(i, ngrams = ngrams) for i in seq_list_1]
+    codon_list_2 = [unique_codon_ngrams(i, ngrams = ngrams) for i in seq_list_2]
 
     return (set(codon_list_1[0]).intersection(*codon_list_1[1:]))\
         .difference(*codon_list_2)
