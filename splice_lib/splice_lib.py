@@ -6,6 +6,43 @@ import gzip
 import sys
 
 
+def get_base_content(seq, bases):
+    '''
+    Get fraction of sequence that consists of 
+    a subset of bases (e.g. GC content)
+
+    Parameters
+    ----------
+    seq : str
+        Nucleotide sequence (note that character identity is not policed for ATGCU bases)
+    bases : str
+        String of bases to check sequence against
+
+    Returns
+    ------
+    float
+        Fraction of sequence consisting of nucleotides in bases input
+
+
+    >>> get_base_content("AAATG", "AG")
+    0.8
+
+    >>> get_base_content("GCCATTACCGAAATGG", "GC")
+    0.5
+
+    >>> get_base_content("GCCATTACCGAAATGG", "G")
+    0.25
+
+    '''
+
+    master_count = 0
+    for i in list(set(bases)):
+        master_count += seq.count(i)
+
+    return float(master_count)/len(seq)
+
+
+
 def translate_seq(seq):
     '''
         Code borrowed from http://www.petercollingridge.co.uk/python-bioinformatics-tools/codon-table
