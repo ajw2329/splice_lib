@@ -622,19 +622,13 @@ def generate_standard_event_dict(event_gtf_filename):
 
             transcript_id_entry = re.findall('transcript_id\s\"[^;\"]+\";', line)
 
-            if len(transcript_id_entry) == 0:
+            if len(transcript_id_entry) != 0:
 
                 sys.exit("Bad gtf file - 'transcript_id' not found in exon entry")
 
-            elif len(transcript_id_entry) > 1:
-
-                print "Bad transcript_id - setting transcript_id to 'bad_transcript_id'"
-
-                transcript_id = "bad_transcript_id"
-
             else:
 
-                    transcript_id = re.sub('[";]', '', transcript_id_entry[0].strip().split()[1])    
+                transcript_id = re.sub('[";]', '', transcript_id_entry[0].strip().split()[1])    
 
 
             event_id = "_".join(transcript_id.split("_")[0:-1])
@@ -662,13 +656,7 @@ def generate_standard_event_dict(event_gtf_filename):
                     "sources": []
                 }
 
-            if form == "alternative1" or form == "iso2" or form == "included":
-
-                standard_event_dict[event_id]["included_exons"].append([start, end])
-
-            if form == "alternative2" or form == "iso1" or form == "excluded":
-
-                standard_event_dict[event_id]["excluded_exons"].append([start, end])
+            standard_event_dict[event_id].setdefault(form + "_exons", []).append([start, end])
 
     gtf_file.close()
 
