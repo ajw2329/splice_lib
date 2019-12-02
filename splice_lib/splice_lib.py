@@ -622,7 +622,7 @@ def generate_standard_event_dict(event_gtf_filename):
 
             transcript_id_entry = re.findall('transcript_id\s\"[^;\"]+\";', line)
 
-            if len(transcript_id_entry) != 0:
+            if len(transcript_id_entry) != 1:
 
                 sys.exit("Bad gtf file - 'transcript_id' not found in exon entry")
 
