@@ -62,7 +62,7 @@ def translate_seq(seq):
   
     for i in codon_gen(seq):
 
-        amino_acid = codon_table.get(codon, '*')
+        amino_acid = codon_table.get(i, '*')
         if amino_acid != '*':
 
             peptide += amino_acid
