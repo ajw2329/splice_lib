@@ -1071,7 +1071,7 @@ def complete_event_dict(
         event_val["included_count"] = 0
         event_val["excluded_count"] = 0
 
-        if (not suppress_eij) or event_val["event_type"] in ["RI", "MR"]:
+        if (not suppress_eij) or event_val["event_type"] in ["RI", "MR"] or len(included_jl) == 0 or len(excluded_jl) == 0:
 
             (included_unique_exon_ol_eij, 
              excluded_unique_exon_ol_eij) = get_exon_overlapping_ei_junctions_list(
