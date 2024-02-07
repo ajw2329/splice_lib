@@ -4,7 +4,7 @@
 
 ### Requirements
 
-`python2.7`  
+`python3`  
 
 
 ### Installation
@@ -12,5 +12,5 @@
 Right now installation can only be achieved by cloning the repository and then running  
 
 ```
-python2.7 setup.py install
+python setup.py install
 ```
